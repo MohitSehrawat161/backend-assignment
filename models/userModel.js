@@ -3,7 +3,7 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   name: {
-    type: String,
+    type: String
   },
   email: {
     type: String,
@@ -35,9 +35,14 @@ const userSchema = new mongoose.Schema({
     message: "Passwords are not same",
   },
   role: {
-    type: String,
-    default: "user",
+    type: [String],
+    default: ["user"],
     enum: ["user", "admin"],
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
   },
   createdAt: Date,
   updatedAt: Date,
@@ -45,6 +50,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", function (next) {
   this.createdAt = new Date();
+  this.updatedAt=new Date()
   next();
 });
 
@@ -61,8 +67,7 @@ userSchema.methods.checkPassword = async function (
   currentPassword,
   userPassword
 ) {
-  console.log('middleware mongo')
-  console.log(await bcrypt.compare(currentPassword, userPassword))
+ 
   return await bcrypt.compare(currentPassword, userPassword);
 };
 
